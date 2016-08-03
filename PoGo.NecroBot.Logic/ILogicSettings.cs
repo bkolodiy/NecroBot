@@ -1,8 +1,8 @@
 ﻿#region using directives
 
-using System.Collections.Generic;
 using POGOProtos.Enums;
 using POGOProtos.Inventory.Item;
+using System.Collections.Generic;
 
 #endregion
 
@@ -46,35 +46,43 @@ namespace PoGo.NecroBot.Logic
         {
         }
 
-        public TransferFilter(int keepMinCp, float keepMinIvPercentage, int keepMinDuplicatePokemon)
+        public TransferFilter(int keepMinCp, float keepMinIvPercentage, string keepMinOperator, int keepMinDuplicatePokemon, 
+            List<PokemonMove> moves = null)
         {
             KeepMinCp = keepMinCp;
             KeepMinIvPercentage = keepMinIvPercentage;
             KeepMinDuplicatePokemon = keepMinDuplicatePokemon;
+            KeepMinOperator = keepMinOperator;
+            Moves = moves ?? new List<PokemonMove>();
         }
 
         public int KeepMinCp { get; set; }
         public float KeepMinIvPercentage { get; set; }
         public int KeepMinDuplicatePokemon { get; set; }
+        public List<PokemonMove> Moves { get; set; }
+        public string KeepMinOperator { get; set; }
     }
 
     public interface ILogicSettings
     {
+        bool TransferWeakPokemon { get; }
         bool DisableHumanWalking { get; }
         bool AutoUpdate { get; }
         bool TransferConfigAndAuthOnUpdate { get; }
         float KeepMinIvPercentage { get; }
         int KeepMinCp { get; }
+        string KeepMinOperator { get; }
         double WalkingSpeedInKilometerPerHour { get; }
         bool EvolveAllPokemonWithEnoughCandy { get; }
         bool KeepPokemonsThatCanEvolve { get; }
         bool TransferDuplicatePokemon { get; }
+        bool TransferDuplicatePokemonOnCapture { get; }
         bool UseEggIncubators { get; }
         int UseGreatBallAboveCp { get; }
         int UseUltraBallAboveCp { get; }
         int UseMasterBallAboveCp { get; }
-        int UseGreatBallAboveIv { get; }
-        int UseUltraBallAboveIv { get; }
+        double UseGreatBallAboveIv { get; }
+        double UseUltraBallAboveIv { get; }
         double UseMasterBallBelowCatchProbability { get; }
         double UseUltraBallBelowCatchProbability { get; }
         double UseGreatBallBelowCatchProbability { get; }
@@ -85,6 +93,7 @@ namespace PoGo.NecroBot.Logic
         float UpgradePokemonIvMinimum { get; }
         int DelayBetweenPlayerActions { get; }
         bool UsePokemonToNotCatchFilter { get; }
+        bool UsePokemonSniperFilterOnly { get; }
         int KeepMinDuplicatePokemon { get; }
         bool PrioritizeIvOverCp { get; }
         int AmountOfTimesToUpgradeLoop { get; }
@@ -92,6 +101,11 @@ namespace PoGo.NecroBot.Logic
         int GetMinStarDustForLevelUp { get; }
         bool UseLuckyEggConstantly { get; }
         bool UseIncenseConstantly { get; }
+        int UseBerriesMinCp { get; }
+        float UseBerriesMinIv { get; }
+        double UseBerriesBelowCatchProbability { get; }
+        string UseBerriesOperator { get; }
+        string UpgradePokemonMinimumStatsOperator { get; }
         int MaxTravelDistanceInMeters { get; }
         bool UseGpxPathing { get; }
         string GpxFile { get; }
@@ -125,6 +139,7 @@ namespace PoGo.NecroBot.Logic
         int TotalAmountOfPokeballsToKeep { get; }
         int TotalAmountOfPotionsToKeep { get; }
         int TotalAmountOfRevivesToKeep { get; }
+        int TotalAmountOfBerriesToKeep { get; }
 
         bool ShowPokeballCountsBeforeRecycle { get; }
         bool VerboseRecycling { get; }

@@ -18,19 +18,21 @@ namespace PoGo.NecroBot.CLI
 {
     internal class Program
     {
-        static ManualResetEvent _quitEvent = new ManualResetEvent(false);
+        private static readonly ManualResetEvent QuitEvent = new ManualResetEvent(false);
+        private static string subPath = "";
         private static void Main(string[] args)
         {
+            AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionEventHandler;
+            Console.Title = "NecroBot starting";
             Console.CancelKeyPress += (sender, eArgs) =>
             {
-                _quitEvent.Set();
+                QuitEvent.Set();
                 eArgs.Cancel = true;
             };
             var culture = CultureInfo.CreateSpecificCulture("en-US");
 
             CultureInfo.DefaultThreadCurrentCulture = culture;
             Thread.CurrentThread.CurrentCulture = culture;
-            var subPath = "";
             if (args.Length > 0)
                 subPath = args[0];
 
@@ -93,7 +95,7 @@ namespace PoGo.NecroBot.CLI
             if (session.LogicSettings.UseSnipeLocationServer)
                 SnipePokemonTask.AsyncStart(session);
 
-            _quitEvent.WaitOne();
+            QuitEvent.WaitOne();
         }
 
         private static void Navigation_UpdatePositionEvent(double lat, double lng)
@@ -103,10 +105,15 @@ namespace PoGo.NecroBot.CLI
 
         private static void SaveLocationToDisk(double lat, double lng)
         {
-            var coordsPath = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + "Config" +
-                             Path.DirectorySeparatorChar + "LastPos.ini";
+            var coordsPath = Path.Combine(Directory.GetCurrentDirectory(), subPath, "Config", "LastPos.ini");
 
             File.WriteAllText(coordsPath, $"{lat}:{lng}");
+        }
+
+        private static void UnhandledExceptionEventHandler(object obj, UnhandledExceptionEventArgs args)
+        {
+            Logger.Write("Exceptiion caught, writing LogBuffer.", force: true);
+            throw new Exception();
         }
     }
 }
